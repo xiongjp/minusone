@@ -2,6 +2,9 @@
 
 import os
 import re
+import cgi
+import cgitb
+cgitb.enable()
 
 class HTTPRequest(object):
     
@@ -18,14 +21,14 @@ def intercept():
     if path == '/register':
         from user import register
         register(req)
-    elif path == '/logn':
+    elif path == '/login':
         from user import login
         login(req)
     elif path == '/logout':
         from user import logout
         logout(req)
     elif path == '/info':
-        from user import showinfo:
+        from user import showinfo
         showinfo(req)
     elif path == '/uploadavatar':
         from avatar import uploadavatar
