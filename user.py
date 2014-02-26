@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+def backhomepage():
+    print 'content-Type: text/html\n'
+    print 'backhomepage() invoked'
+
+
 def register(req):
     print 'content-Type: text/html\n'
     print 'register() invoked'
