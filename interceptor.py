@@ -4,12 +4,30 @@ import os
 import re
 import cgi
 import cgitb
+import Cookie
 cgitb.enable()
 
 class HTTPRequest(object):
     
     def __init__(self, uri):
-        pass
+        self.__DATA = {}
+        env = os.environ
+        cookie_string = env.get("HTTP_COOKIE")
+        if cookie_string:
+            cookie = Cookie.SimpleCookie()
+            cookie.load(cookie_string)
+            for key in cookie.keys():
+                val = cookie[key].value
+                if val:
+                    self.__DATA[key] = val
+        form = cgi.FieldStorage()
+        for key in form.keys():
+            val = form[key].value
+            if val:
+                self.__DATA[key] = val
+    
+    def get(self, key):
+        return self.__DATA[key]
 
 
 def intercept():
@@ -19,26 +37,28 @@ def intercept():
     req = HTTPRequest(uri)
     path = uri.split("?", 1)[0]
     if path == '/register':
-        from user import register
-        register(req)
+        import user
+        username = req.get('username')
+        password = req.get('password')
+        user.register(username, password)
     elif path == '/login':
-        from user import login
-        login(req)
+        import user
+        user.login(username, password)
     elif path == '/logout':
-        from user import logout
-        logout(req)
+        import user
+        user.logout(username, sid)
     elif path == '/info':
-        from user import showinfo
-        showinfo(req)
+        import user
+        user.showinfo(username, sid)
     elif path == '/uploadavatar':
-        from avatar import uploadavatar
-        uploadavatar(req)
+        import avatar
+        avatar.uploadavatar(req)
     elif __APIRE.match(path):
-        from avatar import backavatar
-        backavatar(req)
+        import avatar
+        avatar.backavatar(req)
     else:
-        from error import errorprocess
-        errorprocess(req)
+        import error
+        error.errorprocess(req)
 
 if __name__ == '__main__':
     intercept()
