@@ -28,8 +28,9 @@ CREATE TABLE `yagra_session` (
 CREATE TABLE `yagra_avatar` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `user_id` bigint(20) unsigned NOT NULL,
-    `avatar_name` varchar(32) NOT NULL DEFAULT '',
+    `md5` varchar(32) NOT NULL DEFAULT '',
+    `ext` varchar(10) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`),
-    KEY `avatar_name_key` (`avatar_name`),
+    KEY `md5_key` (`md5`),
     FOREIGN KEY (`user_id`) REFERENCES `yagra_user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

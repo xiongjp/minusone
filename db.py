@@ -2,33 +2,42 @@
 
 import MySQLdb
 
-class database(object):
+HOST = '127.0.0.1'
+USER = 'root'
+PWD = '2112'
+DB = 'yagra'
+CHARACSET = 'utf-8'
 
-    __HOST = '127.0.0.1'
-    __USER = 'root'
-    __PWD = '2112'
-    __DB = 'yagra'
-    __CHARACSET = 'utf-8'
+conn = MySQLdb.connect(HOST, USER, PWD, DB)
+conn.autocommit(1)
+cursor = conn.cursor()
 
-    def __init__(self):
-        
-        # self.conn = MySQLdb.connect('127.0.0.1', 'root', '2112', 'yagra')
-        self.conn = MySQLdb.connect(self.__HOST, self.__USER, self.__PWD, self.__DB)
-        self.conn.autocommit(1)
-        self.cursor = self.conn.cursor()
-        
-        
-    def add_user(self, username, password, salt):
-        username = MySQLdb.escape_string(username)
-        password = MySQLdb.escape_string(password)
-        salt = MySQLdb.escape_string(salt)
-        sql = "INSERT INTO yagra_user(username, password, salt) VALUES('%s', '%s', '%s')" % (username, password, salt)
-        n = self.cursor.execute(sql)
-        # self.conn.commit()
-        return n == 1
-        
-    def get_user(username):
-        username = MySQLdb.escape_string(username)
-        sql = 'SELECT * FROM user WHERE username=%s' % username
-        return exec_sql(sql)
 
+def add_user(username, password, salt):
+    username = MySQLdb.escape_string(username)
+    password = MySQLdb.escape_string(password)
+    salt = MySQLdb.escape_string(salt)
+    sql = "INSERT INTO yagra_user(username, password, salt) VALUES('%s', '%s', '%s')" % (username, password, salt)
+    n = cursor.execute(sql)
+    return n == 1
+
+def get_user(username):
+    username = MySQLdb.escape_string(username)
+    sql = "SELECT password,salt FROM yagra_user WHERE username='%s'" % username
+    n = cursor.execute(sql)
+    if n == 0:
+        return None
+    row = cursor.fetchone()
+    result = {}
+    result['password'] = row[0]
+    result['salt'] = row[1]
+    return result
+    
+def get_avatar_ext(md5):
+    md5 = MySQLdb.escape_string(md5)
+    sql = "SELECT ext FROM yagra_avatar WHERE md5='%s'" % md5
+    n = cursor.execute(sql)
+    if n==0:
+        return None
+    row = cursor.fetchone()
+    return row[0]

@@ -31,7 +31,6 @@ class HTTPRequest(object):
 
 
 def intercept():
-    __APIRE = re.compile(r'/avatar/(?P<md5>[\w]+)')
     env = os.environ
     uri = env["REQUEST_URI"]
     req = HTTPRequest(uri)
@@ -43,19 +42,24 @@ def intercept():
         user.register(username, password)
     elif path == '/login':
         import user
+        username = req.get('username')
+        password = req.get('password')
         user.login(username, password)
     elif path == '/logout':
         import user
         user.logout(username, sid)
     elif path == '/info':
         import user
+        username = req.get('username')
+        sid = req.get('sid')
         user.showinfo(username, sid)
     elif path == '/uploadavatar':
         import avatar
         avatar.uploadavatar(req)
-    elif __APIRE.match(path):
+    elif re.compile(r'/avatar/(?P<md5>[\w]+)').match(path):
         import avatar
-        avatar.backavatar(req)
+        md5 = path[8:40]
+        avatar.back_avatar(md5)
     else:
         import error
         error.errorprocess(req)
