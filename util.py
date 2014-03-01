@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 
 import re
+import cgi
+
+def set_cookie(cookie):
+    print cookie
+
+def save_avatar(filename, file_content):
+    open('avatar/'+filename, 'wb').write(file_content)
 
 def check_username_format(username):
     username = username.strip()
@@ -18,7 +25,7 @@ def check_password_format(password):
     else:
         return False
 
-def error_redirect(location, msg, time=3):
+def msg_redirect(location, msg, time=3):
     print 'content-Type: text/html\n'
     print """<html>
         <head>
@@ -32,7 +39,7 @@ def error_redirect(location, msg, time=3):
     """ % (time, location, msg)
     
 def redirect(location):
-    print 'Location: %s' % location
+    print 'Location: %s\n' % location
     
 def back_info_page(username, md5):
     print 'content-Type: text/html\n'
@@ -40,10 +47,10 @@ def back_info_page(username, md5):
             <html>
             <body>
             <h2>Hello, %s!</h2>
-            <img src="http://www.gravatar.com/avatar/%s" /></div>
+            <img src="%s" /></div>
             <h2>This is your avatar, Change it?</h2><div>
             <form enctype="multipart/form-data" action="/upload" method="post">
-            <p><input type="file" name="file"></p>
+            <p><input type="file" name="avatar"></p>
             <p><input type="submit" value="Upload"></p>
             </form>
             </body>

@@ -17,17 +17,23 @@ class HTTPRequest(object):
             cookie = Cookie.SimpleCookie()
             cookie.load(cookie_string)
             for key in cookie.keys():
-                val = cookie[key].value
-                if val:
+                val = cookie[key]
+                if val != None:
                     self.__DATA[key] = val
         form = cgi.FieldStorage()
         for key in form.keys():
-            val = form[key].value
-            if val:
+            val = form[key]
+            if val != None:
                 self.__DATA[key] = val
     
     def get(self, key):
         return self.__DATA[key]
+        
+    def has_key(self, key):
+        return self.__DATA.has_key(key)
+        
+    def keys(self):
+        return self.__DATA.keys()
 
 
 def intercept():
@@ -37,32 +43,37 @@ def intercept():
     path = uri.split("?", 1)[0]
     if path == '/register':
         import user
-        username = req.get('username')
-        password = req.get('password')
+        username = req.get('username').value
+        password = req.get('password').value
         user.register(username, password)
     elif path == '/login':
         import user
-        username = req.get('username')
-        password = req.get('password')
+        username = req.get('username').value
+        password = req.get('password').value
         user.login(username, password)
     elif path == '/logout':
         import user
         user.logout(username, sid)
     elif path == '/info':
         import user
-        username = req.get('username')
-        sid = req.get('sid')
+        username = req.get('username').value
+        sid = req.get('sid').value
         user.showinfo(username, sid)
-    elif path == '/uploadavatar':
+    elif path == '/upload':
         import avatar
-        avatar.uploadavatar(req)
+        import util
+        username = req.get('username').value
+        sid = req.get('sid').value
+        filename = os.path.basename(req.get('avatar').filename)
+        file_content = req.get('avatar').value
+        avatar.upload_avatar(username, sid, filename, file_content)
     elif re.compile(r'/avatar/(?P<md5>[\w]+)').match(path):
         import avatar
         md5 = path[8:40]
         avatar.back_avatar(md5)
     else:
-        import error
-        error.errorprocess(req)
+        import util
+        util.msg_redirect('/login','unsupported url')
 
 if __name__ == '__main__':
     intercept()
