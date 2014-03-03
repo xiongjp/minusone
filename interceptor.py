@@ -53,7 +53,8 @@ def intercept():
         user.login(username, password)
     elif path == '/logout':
         import user
-        user.logout(username, sid)
+        username = req.get('username').value
+        user.logout(username)
     elif path == '/info':
         import user
         username = req.get('username').value
@@ -73,7 +74,6 @@ def intercept():
         avatar.back_avatar(md5)
     else:
         import util
-        util.msg_redirect('/login','unsupported url')
-
+        util.msg_redirect('/static/homepage.html','unsupported url')
 if __name__ == '__main__':
     intercept()

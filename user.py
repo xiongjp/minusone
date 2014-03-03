@@ -21,13 +21,13 @@ def register(username, password):
     username = username.strip()
     password = password.strip()
     if not util.check_username_format(username):
-        util.msg_redirect('/register', 'username format msg')
+        util.msg_redirect('/static/register.html', 'username format error')
         return
     if not check_username_occupied(username):
-        util.msg_redirect('/register', 'username occupied')
+        util.msg_redirect('/static/register.html', 'username occupied')
         return
     if not util.check_password_format(password):
-        util.msg_redirect('/register', 'password format msg')
+        util.msg_redirect('/static/register.html', 'password format error')
         return
     salt = os.urandom(64)
     password = hashlib.sha256(salt + password).hexdigest()
@@ -37,46 +37,53 @@ def register(username, password):
         cookie = Cookie.SimpleCookie()
         cookie['sid'] = sid
         cookie['username'] = username
-        session.add_session(sid, username)
+        session.add_session(username, sid)
         util.set_cookie(cookie)
-        util.msg_redirect('/info','register success')
+        util.redirect('/info')
         return
     else:
-        util.msg_redirect('/register', 'register failure')
+        util.msg_redirect('/static/register.html', 'register failure')
 
 
 def login(username, password):
     username = username.strip()
     password = password.strip()
     if not util.check_username_format(username):
-        util.msg_redirect('/login', 'username format msg')
+        util.msg_redirect('/static/login.html', 'username format error')
         return
     if not util.check_password_format(password):
-        util.msg_redirect('/login', 'password format msg')
+        util.msg_redirect('/static/login.html', 'password format error')
         return
     user = db.get_user(username)
     if user == None:
-        util.msg_redirect('/login', 'username or password incorrect')
+        util.msg_redirect('/static/login.html', 'username or password incorrect')
         return
     salt = user.get('salt')
     encrypted_password = user.get('password')
     if hashlib.sha256(salt + password).hexdigest() == encrypted_password:
-        util.msg_redirect('/login', 'login success')
+        sid = hashlib.md5(str(random.random())).hexdigest()
+        session.set_session(username, sid)
+        cookie = Cookie.SimpleCookie()
+        cookie['sid'] = sid
+        cookie['username'] = username
+        util.set_cookie(cookie)
+        util.redirect('/info')
         return
     else:
-        util.msg_redirect('/login', 'username or password incorrect')
+        util.msg_redirect('/static/login.html', 'username or password incorrect')
         return
 
 
-def logout(req):
-    print 'content-Type: text/html\n'
-    print 'logout() invoked()'
+def logout(username):
+    username = username.strip()
+    session.clear_sid(username)
+    util.redirect('/static/homepage.html')
 
 def showinfo(username, sid):
     username = username.strip()
     sid = sid.strip()
     if not session.auth_login(username, sid):
-        util.msg_redirect('/login', 'You need to login')
+        util.msg_redirect('/static/login.html', 'You need to login')
         return
     md5 = hashlib.md5(username).hexdigest()
     ext = db.get_avatar_ext(md5)

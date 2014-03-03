@@ -11,9 +11,8 @@ def upload_avatar(username, sid, filename, file_content):
     username = username.strip()
     sid = sid.strip()
     if not session.auth_login(username, sid):
-        util.msg_redirect('/login', 'You need to login')
+        util.msg_redirect('/static/login.html', 'You need to login')
         return
-    
     md5 = hashlib.md5(username).hexdigest()
     ext = os.path.splitext(filename)[-1]
     old_ext = db.get_avatar_ext(md5)
@@ -26,7 +25,8 @@ def upload_avatar(username, sid, filename, file_content):
         db.add_avatar(md5, ext)
     # if save fails ?
     util.save_avatar(md5 + ext, file_content)
-    util.redirect('info')
+    session.update_visit_time(username)
+    util.redirect('/info')
 
 def back_avatar(md5):
     ext = db.get_avatar_ext(md5)
@@ -36,5 +36,4 @@ def back_avatar(md5):
         abspath = os.path.abspath('static/default.jpg')
     content = open(abspath, 'rb').read()
     print 'content-Type: image\n'
-    # print 'content-Type: %s\n' % mimetypes.types_map.get(ext)
     print content

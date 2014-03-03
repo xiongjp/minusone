@@ -39,6 +39,7 @@ def msg_redirect(location, msg, time=3):
     """ % (time, location, msg)
     
 def redirect(location):
+    location = location[1:]
     print 'Location: %s\n' % location
     
 def back_info_page(username, md5):
@@ -46,6 +47,7 @@ def back_info_page(username, md5):
     print '''
             <html>
             <body>
+            <div style="height:15px;"><a href="/logout">Logout</a></div>
             <h2>Hello, %s!</h2>
             <img src="%s" /></div>
             <h2>This is your avatar, Change it?</h2><div>

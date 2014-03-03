@@ -20,7 +20,7 @@ CREATE TABLE `yagra_session` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `username` varchar(60) NOT NULL DEFAULT '',
     `sid` varchar(32) NOT NULL DEFAULT '',
-    `last_visit_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+    `last_visit_time` double unsigned NOT NULL,
     PRIMARY KEY (`id`),
     KEY `username_key` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
