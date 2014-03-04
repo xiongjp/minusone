@@ -1,13 +1,24 @@
 #!/usr/bin/env python
 
 import re
-import cgi
+import os
+import Cookie
 
-def set_cookie(cookie):
+COOKIE_VALIDITY = 10 * 24 * 60 * 60
+
+def set_cookie(data):
+    if not data:
+        return
+    cookie = Cookie.SimpleCookie()
+    for key in data.keys():
+        cookie[key] = data[key]
+        cookie[key]['expires'] = COOKIE_VALIDITY
     print cookie
+
 
 def save_avatar(filename, file_content):
     open('avatar/'+filename, 'wb').write(file_content)
+
 
 def check_username_format(username):
     username = username.strip()
@@ -17,7 +28,8 @@ def check_username_format(username):
         return True
     else:
         return False
-    
+
+
 def check_password_format(password):
     password = password.strip()
     if re.compile(r'([\w]{6,15})').match(password):
@@ -25,36 +37,19 @@ def check_password_format(password):
     else:
         return False
 
-def msg_redirect(location, msg, time=3):
+
+def msg_redirect(location, msg, time=2):
     print 'content-Type: text/html\n'
-    print """<html>
-        <head>
-        <meta http-equiv="refresh" content="%s;url=%s">
-        <title></title>
-        </head>
-        <h2>%s</h2>
-        <body>
-        </body>
-        </html>
-    """ % (time, location, msg)
-    
+    msg_redirect_page = open('template/msg_redirect', 
+                             'r').read() % (time, location, msg)
+    print msg_redirect_page
+
 def redirect(location):
     location = location[1:]
     print 'Location: %s\n' % location
-    
-def back_info_page(username, md5):
+
+
+def back_info_page(username, filename):
     print 'content-Type: text/html\n'
-    print '''
-            <html>
-            <body>
-            <div style="height:15px;"><a href="/logout">Logout</a></div>
-            <h2>Hello, %s!</h2>
-            <img src="%s" /></div>
-            <h2>This is your avatar, Change it?</h2><div>
-            <form enctype="multipart/form-data" action="/upload" method="post">
-            <p><input type="file" name="avatar"></p>
-            <p><input type="submit" value="Upload"></p>
-            </form>
-            </body>
-            </html>
-           ''' % (username, md5)
+    info_page = open('template/info', 'r').read() % (username, filename)
+    print info_page

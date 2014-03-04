@@ -9,6 +9,7 @@ import db
 import util
 import session
 
+
 def check_username_occupied(username):
     username = username.strip()
     if not db.get_user(username):
@@ -34,11 +35,11 @@ def register(username, password):
     success = db.add_user(username, password, salt)
     if success:
         sid = hashlib.md5(str(random.random())).hexdigest()
-        cookie = Cookie.SimpleCookie()
-        cookie['sid'] = sid
-        cookie['username'] = username
         session.add_session(username, sid)
-        util.set_cookie(cookie)
+        data = {}
+        data['sid'] = sid
+        data['username'] = username
+        util.set_cookie(data)
         util.redirect('/info')
         return
     else:
@@ -56,28 +57,31 @@ def login(username, password):
         return
     user = db.get_user(username)
     if user == None:
-        util.msg_redirect('/static/login.html', 'username or password incorrect')
+        util.msg_redirect('/static/login.html', 
+                          'username or password incorrect')
         return
     salt = user.get('salt')
     encrypted_password = user.get('password')
     if hashlib.sha256(salt + password).hexdigest() == encrypted_password:
         sid = hashlib.md5(str(random.random())).hexdigest()
         session.set_session(username, sid)
-        cookie = Cookie.SimpleCookie()
-        cookie['sid'] = sid
-        cookie['username'] = username
-        util.set_cookie(cookie)
+        data = {}
+        data['sid'] = sid
+        data['username'] = username
+        util.set_cookie(data)
         util.redirect('/info')
         return
     else:
-        util.msg_redirect('/static/login.html', 'username or password incorrect')
+        util.msg_redirect('/static/login.html', 
+                          'username or password incorrect')
         return
 
 
 def logout(username):
     username = username.strip()
     session.clear_sid(username)
-    util.redirect('/static/homepage.html')
+    util.redirect('/http://'+os.environ['HTTP_HOST'])
+
 
 def showinfo(username, sid):
     username = username.strip()
@@ -87,7 +91,7 @@ def showinfo(username, sid):
         return
     md5 = hashlib.md5(username).hexdigest()
     ext = db.get_avatar_ext(md5)
-    if ext:
+    if ext != None:
         filename = 'avatar/' + md5 + ext
     else:
         filename = 'static/default.jpg'

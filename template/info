@@ -1,0 +1,12 @@
+<html>
+  <body>
+    <div style="height:15px;"><a href="/logout">Logout</a></div>
+    <h2>Hello, %s!</h2>
+    <img src="%s" /></div>
+    <h2>This is your avatar, Change it?</h2><div>
+    <form enctype="multipart/form-data" action="/upload" method="post">
+        <p><input type="file" name="avatar"></p>
+        <p><input type="submit" value="Upload"></p>
+    </form>
+  </body>
+</html>

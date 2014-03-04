@@ -1,0 +1,10 @@
+<html>
+  <head>
+    <meta http-equiv="refresh" content="%s;url=%s">
+    <title></title>
+  </head>
+  
+  <body>
+    <h2>%s</h2>
+  </body>
+</html>

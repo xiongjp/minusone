@@ -5,14 +5,21 @@ import re
 import cgi
 import cgitb
 import Cookie
+
+import user
+import avatar
+import util
+import config
+
 cgitb.enable()
+
 
 class HTTPRequest(object):
     
     def __init__(self, uri):
         self.__DATA = {}
         env = os.environ
-        cookie_string = env.get("HTTP_COOKIE")
+        cookie_string = env.get('HTTP_COOKIE')
         if cookie_string:
             cookie = Cookie.SimpleCookie()
             cookie.load(cookie_string)
@@ -38,42 +45,36 @@ class HTTPRequest(object):
 
 def intercept():
     env = os.environ
-    uri = env["REQUEST_URI"]
+    uri = env['REQUEST_URI']
     req = HTTPRequest(uri)
-    path = uri.split("?", 1)[0]
+    path = uri.split('?', 1)[0]
     if path == '/register':
-        import user
         username = req.get('username').value
         password = req.get('password').value
         user.register(username, password)
     elif path == '/login':
-        import user
         username = req.get('username').value
         password = req.get('password').value
         user.login(username, password)
     elif path == '/logout':
-        import user
         username = req.get('username').value
         user.logout(username)
     elif path == '/info':
-        import user
         username = req.get('username').value
         sid = req.get('sid').value
         user.showinfo(username, sid)
     elif path == '/upload':
-        import avatar
-        import util
         username = req.get('username').value
         sid = req.get('sid').value
         filename = os.path.basename(req.get('avatar').filename)
         file_content = req.get('avatar').value
         avatar.upload_avatar(username, sid, filename, file_content)
     elif re.compile(r'/avatar/(?P<md5>[\w]+)').match(path):
-        import avatar
         md5 = path[8:40]
         avatar.back_avatar(md5)
     else:
-        import util
         util.msg_redirect('/static/homepage.html','unsupported url')
+
+
 if __name__ == '__main__':
     intercept()
