@@ -1,75 +1,50 @@
 #!/usr/bin/env python
-
-import os
+'''
+Apache redirect all dynamic requests to this script.
+On each dynamic request, this script invokes corresponding function 
+according to request path.
+'''
 import re
-import cgi
 import cgitb
-import Cookie
+import os
 
 import user
 import avatar
 import util
-import config
+import request
+
 
 cgitb.enable()
 
 
-class HTTPRequest(object):
-    
-    def __init__(self, uri):
-        self.__DATA = {}
-        env = os.environ
-        cookie_string = env.get('HTTP_COOKIE')
-        if cookie_string:
-            cookie = Cookie.SimpleCookie()
-            cookie.load(cookie_string)
-            for key in cookie.keys():
-                val = cookie[key]
-                if val != None:
-                    self.__DATA[key] = val
-        form = cgi.FieldStorage()
-        for key in form.keys():
-            val = form[key]
-            if val != None:
-                self.__DATA[key] = val
-    
-    def get(self, key):
-        return self.__DATA[key]
-        
-    def has_key(self, key):
-        return self.__DATA.has_key(key)
-        
-    def keys(self):
-        return self.__DATA.keys()
-
-
 def intercept():
+    '''
+    This function will be invoked when a dynamic request comes.
+    It firstly gets request path from evironment variables,
+    then invokes corresponding functions according to request path.
+    '''
     env = os.environ
+    # Get request uri from environment variables 
     uri = env['REQUEST_URI']
-    req = HTTPRequest(uri)
+    # Get request path, leaving out query string
     path = uri.split('?', 1)[0]
+    # Construct HTTPResquest object
+    req = request.HTTPRequest()
+    
+    # Invoke corresponding functions according to request path
     if path == '/register':
-        username = req.get('username').value
-        password = req.get('password').value
-        user.register(username, password)
+        user.register(req)
     elif path == '/login':
-        username = req.get('username').value
-        password = req.get('password').value
-        user.login(username, password)
+        user.login(req)
     elif path == '/logout':
-        username = req.get('username').value
-        user.logout(username)
+        user.logout(req)
     elif path == '/info':
-        username = req.get('username').value
-        sid = req.get('sid').value
-        user.showinfo(username, sid)
+        user.showinfo(req)
     elif path == '/upload':
-        username = req.get('username').value
-        sid = req.get('sid').value
-        filename = os.path.basename(req.get('avatar').filename)
-        file_content = req.get('avatar').value
-        avatar.upload_avatar(username, sid, filename, file_content)
+        avatar.upload_avatar(req)
     elif re.compile(r'/avatar/(?P<md5>[\w]+)').match(path):
+        # Get 32-char long md5, leaving out image ext or other chars.
+        # If the length of md5 part is less than 32, get all the part. 
         md5 = path[8:40]
         avatar.back_avatar(md5)
     else:

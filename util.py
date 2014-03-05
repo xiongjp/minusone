@@ -4,9 +4,15 @@ import re
 import os
 import Cookie
 
+# cookie valid time, 10 days
 COOKIE_VALIDITY = 10 * 24 * 60 * 60
 
+
 def set_cookie(data):
+    '''
+    Construct a cookie using data in a dict,
+    then write the cookie to http header.
+    '''
     if not data:
         return
     cookie = Cookie.SimpleCookie()
@@ -16,11 +22,8 @@ def set_cookie(data):
     print cookie
 
 
-def save_avatar(filename, file_content):
-    open('avatar/'+filename, 'wb').write(file_content)
-
-
 def check_username_format(username):
+    '''Check whether username match the format of email'''
     username = username.strip()
     username_re = re.compile(r'([a-zA-Z]([\w]*[-_]?[\w]+)*@([\w]*[-_]?[\w]+)+)'
                              r'([\.][a-zA-Z]{2,3}([\.][a-zA-Z]{2})?)')
@@ -31,6 +34,7 @@ def check_username_format(username):
 
 
 def check_password_format(password):
+    '''Check whether password is 6-15-char(only letters and digits) long'''
     password = password.strip()
     if re.compile(r'([\w]{6,15})').match(password):
         return True
@@ -39,17 +43,28 @@ def check_password_format(password):
 
 
 def msg_redirect(location, msg, time=2):
+    '''
+    Redirect browser to the specified location 
+    after displaying the hint msg for specified time.
+    Default displaying time is 2s.
+    '''
     print 'content-Type: text/html\n'
     msg_redirect_page = open('template/msg_redirect', 
                              'r').read() % (time, location, msg)
     print msg_redirect_page
 
+
 def redirect(location):
+    '''Redirect browser to the specified location instantly.'''
     location = location[1:]
     print 'Location: %s\n' % location
 
 
 def back_info_page(username, filename):
+    '''
+    Construct an info page with username and filename
+    then send it back.
+    '''
     print 'content-Type: text/html\n'
     info_page = open('template/info', 'r').read() % (username, filename)
     print info_page
