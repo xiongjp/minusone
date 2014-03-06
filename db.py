@@ -3,15 +3,26 @@
 '''This module defines some functions used to manage database.'''
 
 import time
+import logging
 
 import MySQLdb
 
 from config import *
 
+cursor = None
 
-conn = MySQLdb.connect(HOST, USER, PWD, DB)
-conn.autocommit(1)
-cursor = conn.cursor()
+def get_cursor():
+    global cursor
+    if cursor != None:
+        return cursor
+    try:
+        conn = MySQLdb.connect(HOST, USER, PWD, DB)
+        conn.autocommit(1)
+        cursor = conn.cursor()
+        return cursor
+    except:
+        logging.exception('Database connection error')
+        raise Exception('Database connection error')
 
 
 def add_user(username, password, salt):
@@ -24,6 +35,7 @@ def add_user(username, password, salt):
     salt = MySQLdb.escape_string(salt)
     sql = "INSERT INTO yagra_user(username, password, salt) \
            VALUES('%s', '%s', '%s')" % (username, password, salt)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1
 
@@ -37,6 +49,7 @@ def get_user(username):
     username = MySQLdb.escape_string(username)
     sql = "SELECT id,password,salt \
            FROM yagra_user WHERE username='%s'" % username
+    cursor = get_cursor()
     n = cursor.execute(sql)
     if n == 0:
         return None
@@ -55,7 +68,8 @@ def add_avatar(md5, ext):
     '''
     md5 = MySQLdb.escape_string(md5)
     ext = MySQLdb.escape_string(ext)
-    sql = "INSERT INTO yagra_avatar(md5, ext) VALUES('%s', '%s')"  % (md5, ext)
+    sql = "INSERT INTO yagra_avatar(md5, ext) VALUES('%s', '%s')" % (md5, ext)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1
 
@@ -67,6 +81,7 @@ def get_avatar_ext(md5):
     '''
     md5 = MySQLdb.escape_string(md5)
     sql = "SELECT ext FROM yagra_avatar WHERE md5='%s'" % md5
+    cursor = get_cursor()
     n = cursor.execute(sql)
     if n==0:
         return None
@@ -82,6 +97,7 @@ def update_avatar_ext(md5, ext):
     md5 = MySQLdb.escape_string(md5)
     ext = MySQLdb.escape_string(ext)
     sql = "UPDATE yagra_avatar SET ext='%s' WHERE md5='%s'" % (ext, md5)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1
 
@@ -96,6 +112,7 @@ def add_session(username, sid):
     now_time = time.time()
     sql = "INSERT INTO yagra_session(username, sid, last_visit_time) \
            VALUES('%s', '%s', '%s')" % (username, sid, now_time)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1
 
@@ -109,6 +126,7 @@ def get_session(username):
     username = MySQLdb.escape_string(username)
     sql = "SELECT sid,last_visit_time \
            FROM yagra_session WHERE username='%s'" % username
+    cursor = get_cursor()
     n = cursor.execute(sql)
     if n == 0:
         return None
@@ -128,6 +146,7 @@ def set_session(username, sid, now_time):
     sid = MySQLdb.escape_string(sid)
     sql = "UPDATE yagra_session SET sid='%s',last_visit_time='%s' \
            WHERE username='%s'" % (sid, now_time, username)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1
 
@@ -140,6 +159,7 @@ def set_session_time(username, now_time):
     username = MySQLdb.escape_string(username)
     sql = "UPDATE yagra_session SET last_visit_time='%s' \
            WHERE username='%s'" % (now_time, username)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1
 
@@ -153,5 +173,6 @@ def set_session_sid(username, sid):
     sid = MySQLdb.escape_string(sid)
     sql = "UPDATE yagra_session SET sid='%s' \
            WHERE username='%s'" % (sid, username)
+    cursor = get_cursor()
     n = cursor.execute(sql)
     return n == 1

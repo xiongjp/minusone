@@ -49,7 +49,8 @@ def upload_avatar(req):
         #if add fails ?
         db.add_avatar(md5, ext)
     # if save fails ?
-    open('avatar/'+ md5 + ext, 'wb').write(file_content)
+    with open('avatar/'+ md5 + ext, 'wb') ad f:
+        f.write(file_content)
     session.update_visit_time(username)
     util.redirect('/info')
 
@@ -66,8 +67,8 @@ def back_avatar(md5):
         abspath = os.path.abspath('avatar/' + md5 + ext)
     else:
         abspath = os.path.abspath('static/default.jpg')
-    content = open(abspath, 'rb').read()
-    size = os.path.getsize(abspath)
     print 'Content-Type: image'
     print 'Content-Disposition: inline; filename="%s"\n' % (md5 + ext)
-    print content
+    with open(abspath, 'rb') as f:
+        content = f.read()
+        print content

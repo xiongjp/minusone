@@ -156,5 +156,8 @@ def showinfo(req):
         filename = 'avatar/' + md5 + ext
     else:
         filename = 'static/default.jpg'
-    util.back_info_page(username, filename)
+    print 'content-Type: text/html\n'
+    with open('template/info', 'r') as f:
+        info_page = f.read() % (username, filename)
+        print info_page
 

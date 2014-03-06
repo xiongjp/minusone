@@ -49,22 +49,12 @@ def msg_redirect(location, msg, time=2):
     Default displaying time is 2s.
     '''
     print 'content-Type: text/html\n'
-    msg_redirect_page = open('template/msg_redirect', 
-                             'r').read() % (time, location, msg)
-    print msg_redirect_page
+    with open('template/msg_redirect', 'r') as f:
+        msg_redirect_page = f.read() % (time, location, msg)
+        print msg_redirect_page
 
 
 def redirect(location):
     '''Redirect browser to the specified location instantly.'''
     location = location[1:]
     print 'Location: %s\n' % location
-
-
-def back_info_page(username, filename):
-    '''
-    Construct an info page with username and filename
-    then send it back.
-    '''
-    print 'content-Type: text/html\n'
-    info_page = open('template/info', 'r').read() % (username, filename)
-    print info_page

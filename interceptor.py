@@ -7,6 +7,7 @@ according to request path.
 import re
 import cgitb
 import os
+import logging
 
 import user
 import avatar
@@ -15,6 +16,7 @@ import request
 
 
 cgitb.enable()
+logging.getLogger().setLevel(logging.ERROR)
 
 
 def intercept():
@@ -43,7 +45,7 @@ def intercept():
     elif path == '/upload':
         avatar.upload_avatar(req)
     elif re.compile(r'/avatar/(?P<md5>[\w]+)').match(path):
-        # Get 32-char long md5, leaving out image ext or other chars.
+        # Get 32-char long md5, leaving out file ext or other chars.
         # If the length of md5 part is less than 32, get all the part. 
         md5 = path[8:40]
         avatar.back_avatar(md5)
@@ -52,4 +54,9 @@ def intercept():
 
 
 if __name__ == '__main__':
-    intercept()
+    try:
+        intercept()
+    except:
+        logging.exception('')
+        util.msg_redirect('http://' +os.environ['HTTP_HOST'],
+                          'Oops, Someone have eaten your page!')
