@@ -49,7 +49,7 @@ def upload_avatar(req):
         #if add fails ?
         db.add_avatar(md5, ext)
     # if save fails ?
-    with open('avatar/'+ md5 + ext, 'wb') ad f:
+    with open('avatar/'+ md5 + ext, 'wb') as f:
         f.write(file_content)
     session.update_visit_time(username)
     util.redirect('/info')

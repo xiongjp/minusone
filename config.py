@@ -2,8 +2,8 @@
 
 '''Databse configuration'''
 
-HOST = '127.0.0.1'
-USER = 'root'
-PWD = '2113'
+HOST = 'localhost'
+USER = 'yagra'
+PWD = 'yagra_xjp'
 DB = 'yagra'
 CHARACSET = 'utf-8'
