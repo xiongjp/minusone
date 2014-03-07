@@ -1,16 +1,16 @@
 <VirtualHost *:80>
 	ServerName www.xavatar.com
-	ServerAdmin webmaster@localhost
+	ServerAdmin admin@xavatar.com
 
-	DocumentRoot /home/xjp/minusone/
-	LogFormat "%h %l %u %t %r %>s %b" common
-	ErrorLog /home/xjp/minusone/log/error1.log
-# 	LogLevel error
-	CustomLog /home/xjp/minusone/log/access.log common
+	DocumentRoot /var/www/minusone/
+	ErrorLog /var/www/minusone/log/error.log
+ 	LogLevel warn
+	CustomLog /var/www/minusone/log/access.log combined
 
+	AddHandler cgi-script .py
 	DirectoryIndex /static/homepage.html
 
-	<Directory "/home/xjp/minusone">
+	<Directory "/var/www/minusone">
 		AllowOverride None
 		Options +ExecCGI -MultiViews +SymlinksIfOwnerMatch
 		Order allow,deny
@@ -23,12 +23,4 @@
 			RewriteRule ^(.*)$ /interceptor.py [L]
 		</IfModule>
 	</Directory>
-	
-	# ErrorLog ${APACHE_LOG_DIR}/error.log
-
-	# Possible values include: debug, info, notice, warn, error, crit,
-	# alert, emerg.
-	# LogLevel warn
-
-	#CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
