@@ -13,7 +13,7 @@ CREATE TABLE `yagra_user` (
     `password` varchar(64) NOT NULL DEFAULT '',
     `salt` varchar(64) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`),
-    KEY `username_key` (`username`)
+    UNIQUE KEY `username_key` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `yagra_session` (
@@ -22,7 +22,7 @@ CREATE TABLE `yagra_session` (
     `sid` varchar(32) NOT NULL DEFAULT '',
     `last_visit_time` double unsigned NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `username_key` (`username`)
+    UNIQUE KEY `username_key` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `yagra_avatar` (
@@ -30,5 +30,9 @@ CREATE TABLE `yagra_avatar` (
     `md5` varchar(32) NOT NULL DEFAULT '',
     `ext` varchar(10) NOT NULL DEFAULT '',
     PRIMARY KEY (`id`),
-    KEY `md5_key` (`md5`)
+    UNIQUE KEY `md5_key` (`md5`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DELETE FROM `mysql`.`user` WHERE `mysql`.`user`.`user`='yagra';
+GRANT ALL PRIVILEGES ON yagra.* TO `yagra`@`%` IDENTIFIED BY 'yagra_xjp';
+FLUSH PRIVILEGES;

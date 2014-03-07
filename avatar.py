@@ -37,18 +37,18 @@ def upload_avatar(req):
         return
     filename = os.path.basename(filename)
     file_content = req.get('avatar').value
-    md5 = hashlib.md5(username).hexdigest()
+    md5 = hashlib.md5(username.lower()).hexdigest()
     ext = os.path.splitext(filename)[-1]
     old_ext = db.get_avatar_ext(md5)
-    if old_ext:
+    # old_ext can be empty string
+    if old_ext != None:
         if old_ext != ext:
-            # if update fails ?
+            # if image ext change, remove the old avatar
             os.remove('avatar/'+ md5 + old_ext)
             db.update_avatar_ext(md5, ext)
     else:
-        #if add fails ?
+        # upload for the first time
         db.add_avatar(md5, ext)
-    # if save fails ?
     with open('avatar/'+ md5 + ext, 'wb') as f:
         f.write(file_content)
     session.update_visit_time(username)
@@ -63,12 +63,16 @@ def back_avatar(md5):
     else send the default one back.
     '''
     ext = db.get_avatar_ext(md5)
+    # ext can be empty string
     if ext != None:
         abspath = os.path.abspath('avatar/' + md5 + ext)
+        filename = md5 + ext
+    # the user hasnot uploaded an avatar
     else:
         abspath = os.path.abspath('static/default.jpg')
+        filename = 'default.jpg'
     print 'Content-Type: image'
-    print 'Content-Disposition: inline; filename="%s"\n' % (md5 + ext)
+    print 'Content-Disposition: inline; filename="%s"\n' % filename
     with open(abspath, 'rb') as f:
         content = f.read()
         print content
